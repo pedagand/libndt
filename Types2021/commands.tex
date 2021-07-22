@@ -1,0 +1,83 @@
+% Imported packages
+%\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[svgnames]{xcolor} % Provides better colors with upper cases
+\usepackage{agda} % The Agda package to input Agda code
+%\usepackage[right]{lineno} % Allows to number lines
+\setlength\linenumbersep{-8pt} % Moves left by 8pt the line numbers
+\usepackage{xargs} % Allows to create better commands
+\usepackage{tikz}
+\usepackage{xspace}
+%\usepackage{graphicx}
+\usetikzlibrary{positioning,backgrounds,arrows,automata}
+\usepackage{multicol}
+\usepackage{mdframed}
+
+% Comments macros
+\newcommand{\cath}[1]{\textcolor{Blue}{CD : #1}}
+\newcommand{\amelie}[1]{\textcolor{Red}{AL : #1}}
+\newcommand{\mathieu}[1]{\textcolor{Green}{MM : #1}}
+
+% Special words macros
+\newcommand{\coq}{\textsc{Coq}\xspace}
+\newcommand{\agda}{\textsc{Agda}\xspace}
+\newcommand{\lagda}{\texttt{lagda}\xspace}
+\newcommand{\haskell}{\textsc{Haskell}\xspace}
+\newcommand{\datatypes}{datatypes\xspace}
+\newcommand{\Datatypes}{Datatypes\xspace}
+\newcommand{\datatype}{datatype\xspace}
+\newcommand{\libName}{\textsc{LibNDT}\xspace}
+\newcommand{\linear}{\textsc{LNDT}\xspace}
+\newcommand{\linears}{\textsc{LNDTs}\xspace}
+\newcommand{\linearsFull}{linked nested \datatypes\xspace}
+
+% URL macros
+\newcommand{\gitURL}{\url{https://bitbucket.org/MonsieurO/nested/}}
+
+% Mapping of unknown characters
+\DeclareUnicodeCharacter{8759}{\ensuremath{::}}
+\DeclareUnicodeCharacter{955}{\ensuremath{\lambda}}
+\DeclareUnicodeCharacter{969}{\ensuremath{\omega}}
+
+% Other macros
+\AgdaNoSpaceAroundCode % The name says it all
+\renewcommandx*{\hrulefill}[2][1=0.3mm,2=0pt] % A \rule with parameterized positioning
+    {\leavevmode \leaders \hbox to 1pt{\rule[#2]{1pt}{#1}} \hfill \kern 0pt}
+
+\setlength{\mathindent}{.8 cm}%
+
+% Macros to define paragraphs, either the first of the section, or the next one
+% This is useful because lipics treats paragraphs like sections, which is not always what we want
+\newcommand{\myfirstparagraph}[1]{\noindent\textbf{#1} --}%
+\newcommand{\myparagraph}[1]{\vspace{.2cm}\myfirstparagraph{#1}}%
+
+\tikzset{
+    node distance=5mm and -9mm, %Caractéristiques sur les noeuds
+    boite/.style={ %Caractéristiques sur le styles des boites
+        fill=blue!50!cyan!70,
+        draw,
+        align=center,
+        font=\footnotesize\bfseries,
+        text=white,
+    },
+    boite coins ronds/.style={ %Caractéristiques sur les boites
+        boite,
+        rounded corners=3pt
+    },
+    boite circulaire/.style={ %Caractéristiques sur les boites circulaires
+        boite,
+        circle
+    },
+    fleche/.style={ %Caractéristiques sur les flèches
+        line cap=round,
+        -latex,
+        line width=0.25mm,
+	    draw=blue!50!cyan!30,
+	},
+	grosse fleche/.style={ %Caractéristiques sur les grosses flèches
+	    fleche,
+	    line width=1mm
+	},
+}

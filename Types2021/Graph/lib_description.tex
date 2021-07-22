@@ -1,0 +1,31 @@
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm, semithick]
+\tikzstyle{every state}=[fill=blue,draw=none,text=white]
+
+%\node[state]         (A) {$Library$};
+
+\node[state]         (A)                    {$Null$};
+
+\node[state]         (N) [left of=A]        {$Nested$};
+\node[state]         (L) [below of=N]       {$List$};
+\node[state]         (M) [below right of=N] {$Maybe$};
+\node[state]         (E) [below left  of=N] {$Nest$};
+\node[state]         (B) [left of=N]        {$Bush$};
+
+\node[state]         (T) [left  of=B]       {$Tuples$};
+\node[state]         (I) [below left  of=T] {$Identity$};
+\node[state]         (P) [below right of=T] {$Pair$};
+
+\path (N) edge              node {} (L)
+	      edge              node {} (M)
+		  edge              node {} (E)
+		  edge              node {} (B)
+	  (A) edge              node {} (M)
+	  (T) edge              node {} (I)
+	      edge              node {} (P)
+	  (I) edge [bend right] node {} (L)
+	  (P) edge              node {} (E)	
+	  (B) edge [loop below] node {} (B);
+%	  (A) edge              node {} (T)
+%	      edge              node {} (N)
+%	      edge              node {} (U);
+\end{tikzpicture}

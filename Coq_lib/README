@@ -1,0 +1,7 @@
+Welcome to the Coq Side Library!
+
+First of all, run `./start.sh` to create the `Makefile` associated to this library.
+Then, you can run `make` to compile .v files, or `make clean` to delete .vo, .vok, .vos, etc.
+
+/!\ If you change the hierarchy of files, don't forget to change the file `_CoqProject` too. Currently, this file associates `~/nested/Coq_lib` to `R`, and then compiles all the files listed.
+Run `.start.sh` again to update the `Makefile`.

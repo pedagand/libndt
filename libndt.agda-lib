@@ -1,0 +1,3 @@
+name: lndtlib
+include: Agda_lib Types2021
+depend: standard-library

@@ -1,0 +1,14 @@
+-R . R
+
+Spreadable.v
+Tuple.v
+Null.v
+LNDT.v
+Examples.v
+Tuples/Pair.v
+Tuples/Identity.v
+LNDT/Nest.v
+LNDT/List.v
+LNDT/Maybe.v
+
+# Prelude/Definitions.v
