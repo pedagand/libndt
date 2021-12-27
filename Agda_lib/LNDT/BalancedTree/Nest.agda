@@ -20,4 +20,5 @@ open import LNDT.BalancedTree 1 public
     bt-∈          to nest-∈ ; 
     bt-empty      to nest-empty ;
     bt-dec-∈      to nest-dec-∈ ;
-    bt-dec-eq     to nest-dec-eq)
+    bt-dec-eq     to nest-dec-eq ;
+    bt-depth      to nest-depth)
