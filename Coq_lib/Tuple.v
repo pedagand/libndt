@@ -4,18 +4,17 @@ Require Import Spreadable.
 
 (** ** The tuples type constructors family *)
 Fixpoint Tuple (n : nat) (A : Type) : Type :=
-match n with
- | 0   => A
- | S p => A * Tuple p A
-end.
+ match n with
+  | 0   => A
+  | S p => A * Tuple p A
+ end.
 
 (** ** Tuple n is spread-able for any n *)
-
 Fixpoint tuple_map (n : nat) : Map (Tuple n) :=
-match n with
- | 0   => fun A B f t => f t
- | S p => fun A B f t => (f (fst t), tuple_map p _ _ f (snd t))
-end.
+ match n with
+  | 0   => fun A B f t => f t
+  | S p => fun A B f t => (f (fst t), tuple_map p _ _ f (snd t))
+ end.
 
 Lemma tuple_cmp_map (n : nat) : MapComposition (tuple_map n).
 Proof.
@@ -37,25 +36,25 @@ Definition tuple_mapable n : MapAble (Tuple n) :=
   mkMap (Tuple n) (tuple_map n) (tuple_cng_map n) (tuple_cmp_map n).
 
 Fixpoint tuple_foldr (n : nat) : Fold (Tuple n) :=
-match n with
- | 0   => fun A B f b t => f b t
- | S p => fun A B f b t => f (tuple_foldr p _ _ f b (snd t)) (fst t)
-end.
+ match n with
+  | 0   => fun A B f b t => f b t
+  | S p => fun A B f b t => f (tuple_foldr p _ _ f b (snd t)) (fst t)
+ end.
 
 Fixpoint tuple_foldl (n : nat) : Fold (Tuple n) :=
-match n with
- | 0   => fun A B f b t => f b t
- | S p => fun A B f b t => tuple_foldl p _ _ f (f b (fst t)) (snd t)
-end.
+ match n with
+  | 0   => fun A B f b t => f b t
+  | S p => fun A B f b t => tuple_foldl p _ _ f (f b (fst t)) (snd t)
+ end.
 
 Definition tuple_foldable n : FoldAble (Tuple n) :=
   mkFold (Tuple n) (tuple_foldr n) (tuple_foldl n).
 
 Fixpoint tuple_any (n : nat) : TransPred (Tuple n) :=
-match n with
- | 0   => fun A P t => P t
- | S p => fun A P t => (P (fst t)) \/ (tuple_any _ _ P (snd t))
-end.
+ match n with
+  | 0   => fun A P t => P t
+  | S p => fun A P t => (P (fst t)) \/ (tuple_any _ _ P (snd t))
+ end.
 
 Lemma tuple_dec_any (n : nat) : TransDec (tuple_any n).
 Proof.
@@ -71,10 +70,10 @@ unfold TransDec. induction n.
 Defined.
 
 Fixpoint tuple_all (n : nat) : TransPred (Tuple n) :=
-match n with
- | 0   => fun A P t => P t
- | S p => fun A P t => (P (fst t)) /\ (tuple_all _ _ P (snd t))
-end.
+ match n with
+  | 0   => fun A P t => P t
+  | S p => fun A P t => (P (fst t)) /\ (tuple_all _ _ P (snd t))
+ end.
 
 Lemma tuple_dec_all (n : nat) : TransDec (tuple_all n).
 Proof.
@@ -95,17 +94,8 @@ Definition tuple_any_all_able n : AnyAllAble (Tuple n) :=
   mkAnyAll (Tuple n) (tuple_any n) (tuple_dec_any n)
       (tuple_all n) (tuple_dec_all n).
 
-(* @TODO delete? *)
-Lemma tuple_map_spec (n : nat) : MapSpec (tuple_mapable n) (tuple_any_all_able n).
-Proof.
-unfold MapSpec. induction n;simpl.
- - intros A B x l f Hyp. rewrite Hyp. reflexivity.
- - intros A B x l f Hyp. destruct Hyp.
-    + left. rewrite H. reflexivity.
-    + right. simpl in IHn. apply IHn. exact H.
-Defined.
-
 Lemma tuple_dec_eq (n : nat) : DecEq (Tuple n).
+Proof.
 unfold DecEq. induction n; intros.
  + exact X.
  + unfold Decidable in *. destruct x ; destruct y. decide equality.
@@ -119,14 +109,14 @@ Definition tuple_spreadable (n : nat) : SpreadAble (Tuple n) :=
           (tuple_foldable n)
           (tuple_mapable n)
           (tuple_any_all_able n)
-          (tuple_eqable n) (* _ _ _
-          (tuple_map_spec n)*).
+          (tuple_eqable n) 
+          (* _ _ _ (tuple_map_spec n)*).
 
 Eval compute in (mkSpread (Tuple 2)).
 
 Definition in_tuples n : forall A, A -> Tuple n A -> Prop
  := fun A x => tuple_any n A (fun y => x = y ) .
-    
+
 Lemma in_tuples_S n : forall A x a t,
  in_tuples (S n) _ x (a, t) <-> x = a \/ in_tuples n A x t.
 Proof.
@@ -146,7 +136,7 @@ Qed.
 
 (** ** The size of a Tuple can be retrieved, and is equal to S n *)
 Definition tuplesSize (n : nat) {A : Type} (T : Tuple n A) : nat :=
-  size _ (tuple_foldable n) T.
+  size _ (tuple_foldable n) A T.
 (*
 Lemma sizen_equiv_sucn : forall {n} {A : Type} {t : Tuple n A},
 tuplesSize n t = S n.

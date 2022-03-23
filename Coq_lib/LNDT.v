@@ -4,7 +4,7 @@ Require Import Lia.
 
 Open Scope list_scope.
 
-(** * The specification for nested data types **)
+(** * The specification for Linked Nested Data Types **)
 Inductive LNDT (F : TT) (A : Type) : Type :=
  | empty : LNDT F A
  | nest : A -> LNDT F (F A) -> LNDT F A.
@@ -14,6 +14,7 @@ Inductive LNDT (F : TT) (A : Type) : Type :=
 Eval compute in (LNDT list).
 
 Lemma ex1 : LNDT list nat.
+Proof.
 apply (nest list nat 1).
 apply (nest list (list nat) (cons 1 (cons 2 (cons 3 nil)))).
 constructor.
@@ -65,8 +66,7 @@ ou plus lisiblement sans les infos de type
     (nest [[1;2] ; [2]]
       empty)))
 *)
-   
-      
+
 Definition nested3 : LNDT (Tuple 2) nat.
 Proof.
 apply (nest (Tuple 2) nat
@@ -92,14 +92,14 @@ Proof.
   rewrite Heq_A, Heq_Nested. reflexivity.
 Defined.
 
-(** * Regularity of a type constructor F can be propagated to (Nested F) *)
+(** * All spread-able elements can indeed be spread from F to (LNDT F) *)
 
 (** ** Map function *)
-Fixpoint lndt_map {F : TT} (map : Map F) A B (f : A -> B) (t : LNDT F A) :=
-match t with
- |empty _ _     => empty _ _
- |nest  _ _ x e => nest F B (f x) (lndt_map map _ _ (map _ _ f) e)
-end.
+Fixpoint lndt_map {F : TT} (map : Map F) (A B : Type) (f : A -> B) (t : LNDT F A) : LNDT F B :=
+ match t with
+  |empty _ _     => empty _ _
+  |nest  _ _ x e => nest F B (f x) (lndt_map map (F A) (F B) (map A B f) e)
+ end.
 
 Definition ff (n : nat) := match n with
   0 => false

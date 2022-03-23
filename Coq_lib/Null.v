@@ -56,20 +56,21 @@ Definition null_spreadable : SpreadAble Null :=
               SnullAny SnullDecAny)
     (mkEq Null SnullDecEq). (* SnullIn_map. *)
 
-Definition null_map     := map     _ (map_able _ null_spreadable).
-Definition null_cng_map := map     _ (map_able _ null_spreadable).
-Definition null_cmp_map := map     _ (map_able _ null_spreadable).
-Definition null_foldr   := foldr   _ (fold_able _ null_spreadable).
-Definition null_foldl   := foldl   _ (fold_able _ null_spreadable).
-Definition null_any     := any     _ (any_all_able _ null_spreadable).
-Definition null_dec_any := dec_any _ (any_all_able _ null_spreadable).
-Definition null_all     := all     _ (any_all_able _ null_spreadable).
-Definition null_dec_all := dec_all _ (any_all_able _ null_spreadable).
-Definition null_dec_eq  := dec_eq  _ (eq_able _ null_spreadable).
-
+Definition null_map         := map        _ (map_able _ null_spreadable).
+Definition null_cng_map     := map_congru _ (map_able _ null_spreadable).
+Definition null_cmp_map     := map_compo  _ (map_able _ null_spreadable).
+Definition null_foldr       := foldr      _ (fold_able _ null_spreadable).
+Definition null_foldl       := foldl      _ (fold_able _ null_spreadable).
 (** ** A size of Null can be defined, but can never be called
        However, it is useful in the definition of Maybe *)
-(* @TODO enlever les {  } dans Spreadable.v ?
-Definition null_size    := size    _ (fold_able _ null_spreadable). *)
-
-Definition null_in_prop := in_prop _ (any_all_able _ null_spreadable).
+Definition null_size        := size        _ (fold_able _ null_spreadable).
+Definition null_flatten     := flatten     _ (fold_able _ null_spreadable).
+(* Definition null_show        := show        _ (fold_able _ null_spreadable). *)
+Definition null_any         := any         _ (any_all_able _ null_spreadable).
+Definition null_dec_any     := dec_any     _ (any_all_able _ null_spreadable).
+Definition null_all         := all         _ (any_all_able _ null_spreadable).
+Definition null_dec_all     := dec_all     _ (any_all_able _ null_spreadable).
+Definition null_in_prop     := in_prop     _ (any_all_able _ null_spreadable).
+Definition null_empty       := empty       _ (any_all_able _ null_spreadable).
+Definition null_dec_in_prop := dec_in_prop _ (any_all_able _ null_spreadable).
+Definition null_dec_eq      := dec_eq      _ (eq_able _ null_spreadable).

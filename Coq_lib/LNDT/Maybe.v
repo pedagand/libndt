@@ -1,16 +1,15 @@
-(** * The Maybe data type as an instance of a nested data type *)
+(** * Maybe seen as an instance of LNDT *)
 
 Require Import LNDT.
 Require Import Spreadable.
 Require Import Null.
 Require Import Lia.
 
-(** ** The Maybe datatype can be constructed as a specific nested type *)
-Definition Maybe : Type -> Type := Nested Null.
+Definition Maybe : TT := LNDT Null.
 
 (** ** Patterns to match the usual notations of the inhabitants of Maybe *)
-Definition nothing F A : Nested F A := empty F A.
-Definition just  F A x : Nested F A := nest _ _ x (empty _ _).
+Definition nothing F A : LNDT F A := LNDT.empty F A.
+Definition just  F A x : LNDT F A := nest _ _ x (LNDT.empty _ _).
 
 (** ** A proof that nothing and (just x) are the only two
        possible inhabitants of Maybe *)
@@ -26,22 +25,26 @@ induction x.
     - destruct H. contradiction.
 Defined.
 
-(** ** Maybe is regular because Null and Nested are regular. *)
+(** ** Maybe is spread-able because Null and LNDT are spread-able. *)
 
-Definition maybeRegular : Regular Maybe := nestedRegular _ nullRegular.
+Definition maybe_spreadable : SpreadAble Maybe := lndt_spreadable null_spreadable.
 
-Definition maybeMap     := map     _ maybeRegular.
-Definition maybeCngMap  := cngMap  _ maybeRegular.
-Definition maybeCmpMap  := cmpMap  _ maybeRegular.
-Definition maybeFoldr   := foldr   _ maybeRegular.
-Definition maybeFoldl   := foldl   _ maybeRegular.
-Definition maybeAny     := any     _ maybeRegular.
-Definition maybeDecAny  := decAny  _ maybeRegular.
-Definition maybeAll     := all     _ maybeRegular.
-Definition maybeDecAll  := decAll  _ maybeRegular.
-Definition maybeDecEq   := decEq   _ maybeRegular.
-Definition maybeSize    := size    _ maybeRegular.
-Definition maybeIn_prop := in_prop _ maybeRegular.
+Definition maybe_map         := map         _ (map_able _ maybe_spreadable).
+Definition maybe_cng_map     := map_congru  _ (map_able _ maybe_spreadable).
+Definition maybe_cmp_map     := map_compo   _ (map_able _ maybe_spreadable).
+Definition maybe_foldr       := foldr       _ (fold_able _ maybe_spreadable).
+Definition maybe_foldl       := foldl       _ (fold_able _ maybe_spreadable).
+Definition maybe_size        := size        _ (fold_able _ maybe_spreadable).
+Definition maybe_flatten     := flatten     _ (fold_able _ maybe_spreadable).
+(* Definition maybe_show        := show        _ (fold_able _ maybe_spreadable). *)
+Definition maybe_any         := any         _ (any_all_able _ maybe_spreadable).
+Definition maybe_dec_any     := dec_any     _ (any_all_able _ maybe_spreadable).
+Definition maybe_all         := all         _ (any_all_able _ maybe_spreadable).
+Definition maybe_dec_all     := dec_all     _ (any_all_able _ maybe_spreadable).
+Definition maybe_in_prop     := in_prop     _ (any_all_able _ maybe_spreadable).
+Definition maybe_empty       := empty       _ (any_all_able _ maybe_spreadable).
+Definition maybe_dec_in_prop := dec_in_prop _ (any_all_able _ maybe_spreadable).
+Definition maybe_dec_eq      := dec_eq      _ (eq_able _ maybe_spreadable).
 
 (** ** Example of inhabitants of Maybe ℕ *)
 Definition example1 : Maybe nat := just _ _ 10.
@@ -49,45 +52,45 @@ Definition example2 : Maybe nat := nothing _ _.
 
 (** ** Examples of function calls over these examples *)
 Definition example1Map : Maybe nat :=
-  maybeMap _ _ (fun x => x + 3) example1.
+  maybe_map _ _ (fun x => x + 3) example1.
 
 Definition example1Foldr : nat :=
-  maybeFoldr _ _ (fun x y => x + y) 0 example1.
+  maybe_foldr _ _ (fun x y => x + y) 0 example1.
 
 Definition example1Foldl : nat :=
-  maybeFoldl _ _ (fun x y => x + y) 0 example1.
+  maybe_foldl _ _ (fun x y => x + y) 0 example1.
 
-Definition example1Size : nat := maybeSize _ example1.
+Definition example1Size : nat := maybe_size _ example1.
 
 Eval compute in example1Size.
 (* = 1 : nat *)
 
 Definition example2Map : Maybe nat :=
-  maybeMap _ _ (fun x => x + 3) example2.
+  maybe_map _ _ (fun x => x + 3) example2.
 
 Eval compute in example2Map.
 
 Definition example2Foldr : nat :=
-  maybeFoldr _ _ (fun x y => x + y) 0 example2.
+  maybe_foldr _ _ (fun x y => x + y) 0 example2.
 
 Definition example2Foldl : nat :=
-  maybeFoldl _ _ (fun x y => x + y) 0 example2.
+  maybe_foldl _ _ (fun x y => x + y) 0 example2.
 
-Definition example2Size : nat := maybeSize _ example2.
+Definition example2Size : nat := maybe_size _ example2.
 
 Eval compute in example2Size.
 (* = 0 : nat *)
 
 (** ** Examples of predications over these examples *)
 
-Lemma example1Any : maybeAny _ (fun x => x > 3) example1.
-Proof. unfold maybeAny. simpl. lia. Defined.
+Lemma example1Any : maybe_any _ (fun x => x > 3) example1.
+Proof. unfold maybe_any. simpl. lia. Defined.
 
-Lemma example1All : maybeAll _ (fun x => x < 12) example1.
-Proof. unfold maybeAll. simpl. lia. Defined.
+Lemma example1All : maybe_all _ (fun x => x < 12) example1.
+Proof. unfold maybe_all. simpl. lia. Defined.
 
-Lemma example2Any : forall (P : nat -> Prop), ~ maybeAny _ P example2.
+Lemma example2Any : forall (P : nat -> Prop), ~ maybe_any _ P example2.
 Proof. unfold example2. intros P Hmaybe. contradiction. Defined.
 
-Lemma example2All : forall (P : nat -> Prop), maybeAll _ P example2.
-Proof. unfold example2, maybeAll. intro P.  simpl. auto. Defined.
+Lemma example2All : forall (P : nat -> Prop), maybe_all _ P example2.
+Proof. unfold example2, maybe_all. intro P.  simpl. auto. Defined.
