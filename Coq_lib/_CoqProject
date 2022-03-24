@@ -4,11 +4,15 @@ Spreadable.v
 Tuple.v
 Null.v
 LNDT.v
-Examples.v
-Tuples/Pair.v
-Tuples/Identity.v
-LNDT/Nest.v
-LNDT/List.v
+# Tuples/Pair.v
+# Tuples/Identity.v
+# LNDT/Nest.v
+# LNDT/List.v
 LNDT/Maybe.v
+LNDT/PerfectTree.v
+LNDT/Bush.v
+LNDT/PerfectTree/List.v
+LNDT/PerfectTree/Nest.v
+# Examples.v
 
 # Prelude/Definitions.v
