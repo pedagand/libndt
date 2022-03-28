@@ -107,13 +107,16 @@ Definition ff (n : nat) := match n with
 end.
 
 (** ** Congruence function *)
-Require Import FunctionalExtensionality.
+Require Import FunInd.
+Functional Scheme lndt_map_ind := Induction for lndt_map Sort Prop.
 
 Lemma lndt_cng_map : forall {F : TT} {map : Map F}
   (cgMap : MapCongruence map), MapCongruence (lndt_map map).
 Proof.
-  unfold MapCongruence, Map. intros F map Hmap A B f g x Heq.
-  extensionality in Heq. rewrite Heq. reflexivity.
+  unfold MapCongruence, Map. intros.
+  functional induction (lndt_map map A B f x).
+  + auto.
+  + simpl; rewrite H. rewrite IHl with (g:= map A B g). reflexivity. intro ; apply cgMap; assumption. 
 Defined.
 
 (** ** Composition function *)
