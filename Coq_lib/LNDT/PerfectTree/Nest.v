@@ -48,6 +48,8 @@ Definition exampleMap : Nest nat :=
 
 Eval compute in exampleMap.
 
+Eval compute in (nest_map _ _ ff example).
+
 Definition exampleFoldr : nat :=
   nest_foldr _ _ (fun x y => x + y) 0 example.
 
