@@ -105,9 +105,7 @@ Definition ff (n : nat) := match n with
   0 => false
 | _ => true
 end.
-(* @TODO mv
-Eval compute in (nestedMap list maplist nat bool ff nested1).
-*)
+
 (** ** Congruence function *)
 Require Import FunctionalExtensionality.
 
