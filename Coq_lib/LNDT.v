@@ -123,16 +123,16 @@ Defined.
 Lemma lndt_cmp_map : forall {F : TT} {map : Map F} (cgMap : MapCongruence map)
   (cpMap : MapComposition map), MapComposition (lndt_map map).
 Proof.
-  unfold MapComposition, MapCongruence. intros F map Hyp1 Hyp2 A B C f g x.
-  induction x.
-   + reflexivity.
-   + simpl in *. specialize (Hyp2 A B C f g). (* rewrite Hyp2. rewrite Hyp1.
-  intros F map A B C f g x.
+unfold MapComposition, MapCongruence. 
+intros until x. revert f g. revert B C. revert x.
 induction x.
- + reflexivity.
- + simpl in *. unfold Map in map.
-*)
-Admitted.
++ reflexivity.
++ intros; simpl.
+  rewrite <- (IHx _ _ (map A B f) (map B C g)).
+  rewrite lndt_cng_map with 
+    (f0 := (map A C (fun x0 : A => g (f x0))))
+    (g0:= (fun x0 => map B C g (map A B f x0))) ; auto.
+Qed.
 
 Definition lndt_mapable {F : TT} (mp : MapAble F) : MapAble (LNDT F) :=
   mkMap (LNDT F)
