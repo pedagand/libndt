@@ -44,8 +44,7 @@ depth = lndt-ind _ 0 (λ _ → suc)
 -- Map function and properties
 
 lndt-map : ∀ {F : TT} → Map F → Map (LNDT F)
-lndt-map _   _ []      = []
-lndt-map map f (x ∷ v) = f x ∷ lndt-map map (map f) v
+lndt-map map f x = gndt-map map f x
 
 lndt-map-cong : ∀ {F : TT} {map : Map F} → MapCongruence map → MapCongruence (lndt-map map)
 lndt-map-cong _     _ _ []      _ = refl

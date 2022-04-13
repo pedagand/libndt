@@ -67,3 +67,30 @@ module Induction {Σ : Sig}{F : TT}
        □-map (Σ₁ `⊎ Σ₂) (inj₂ xs₂) = □-map Σ₂ xs₂
 
 open Induction public
+
+-- All spread-able elements can indeed be spread from F to GNDT Σ F
+
+-- Map function and properties
+
+module Map {Σ : Sig}{F : TT}(map : Map F) where
+
+  gndt-map : {A B : Set} → (A → B) → GNDT Σ F A → GNDT Σ F B
+  help : ∀ Σ' {A B : Set}(f : A → B) → ⟦ Σ' ⟧ A (GNDT Σ F (F A)) → ⟦ Σ' ⟧ B (GNDT Σ F (F B))
+
+  gndt-map f (ctor xs) = ctor (help Σ f xs)
+
+  help `⊤ f tt = tt
+  help (`K S) f k = k
+  help `X f x = gndt-map (map f) x
+  help `A f a = f a
+  help (Σ₁ `× Σ₂) f (xs₁ , xs₂) = help Σ₁ f xs₁ , help Σ₂ f xs₂
+  help (Σ₁ `⊎ Σ₂) f (inj₁ xs₁) = inj₁ (help Σ₁ f xs₁)
+  help (Σ₁ `⊎ Σ₂) f (inj₂ xs₂) = inj₂ (help Σ₂ f xs₂)
+
+-- Same as above, without the painful inlining of `gndt-map` into `⟦ Σ ⟧-map`
+{-# TERMINATING #-}
+gndt-map : ∀ {Σ : Sig}{F : TT} → Map F → Map (GNDT Σ F)
+gndt-map {Σ} map f (ctor xs) = ctor (⟦ Σ ⟧-map f (gndt-map map (map f)) xs)
+
+-- XXX: similarly, we should get `lndt-map-cong`, `lndt-map-comp`, `lndt-map-able`
+-- Note: this is missing something about `map-id`
