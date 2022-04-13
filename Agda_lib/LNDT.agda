@@ -5,7 +5,7 @@ open import SpreadAble
 
 -- The specification for linked lndt data types
 
-data LNDT {a} (F : TT) (A : Set a) : Set a where
+data LNDT (F : TT) (A : Set) : Set where
   [] : LNDT F A
   _∷_ : A → LNDT F (F A) → LNDT F A
 
@@ -15,15 +15,15 @@ infixr 3 _∷_
 
 lndt-ind : ∀
   {F   : TT} {b}
-  (P   : ∀ {a} {A : Set a} → LNDT F A → Set b)
-  (P[] : ∀ {a} {A : Set a} → P {A = A} [])
-  (f   : ∀ {a} {A : Set a} (x : A) {l} → P l → P (x ∷ l))
-  {a} {A : Set a} (x : LNDT F A) → P x
+  (P   : ∀ {A : Set} → LNDT F A → Set b)
+  (P[] : ∀ {A : Set} → P {A = A} [])
+  (f   : ∀ {A : Set} (x : A) {l} → P l → P (x ∷ l))
+  {A : Set} (x : LNDT F A) → P x
 lndt-ind     _ P[] _ []      = P[]
 lndt-ind {F} P P[] f (x ∷ e) = f x (lndt-ind {F} P P[] f e)
 
 -- The depth of an instance of LNDT
-depth : ∀ {a} {F : TT} {A : Set a} → LNDT F A → ℕ
+depth : ∀ {F : TT} {A : Set} → LNDT F A → ℕ
 depth = lndt-ind _ 0 (λ _ → suc)
 
 -- All spread-able elements can indeed be spread from F to LNDT F
@@ -44,7 +44,7 @@ lndt-map-comp _     _     _ _ []      = refl
 lndt-map-comp cgMap cpMap f g (x ∷ s)
   rewrite trans (lndt-map-cong cgMap _ _ s (cpMap f g)) (lndt-map-comp cgMap cpMap _ _ s) = refl
 
-lndt-map-able : ∀ {F : ∀ {a} → Set a → Set a} → MapAble F → MapAble (LNDT F)
+lndt-map-able : ∀ {F : TT} → MapAble F → MapAble (LNDT F)
 lndt-map-able mp = M⟨
     lndt-map (map mp) ,
     lndt-map-cong (map-cong mp) ,
@@ -67,7 +67,7 @@ lndt-fold-able fp = F⟨
 
 -- Any predicate transformer
 
-data lndt-any {F : TT} (T : TransPred F) {a b} {A : Set a} (P : Pred A b) : Pred (LNDT F A) b where
+data lndt-any {F : TT} (T : TransPred F) {b} {A : Set} (P : Pred A b) : Pred (LNDT F A) b where
   here : ∀ {a x} → P a → lndt-any T P (a ∷ x)
   there : ∀ {a x} → lndt-any T (T P) x → lndt-any T P (a ∷ x)
 
@@ -80,7 +80,7 @@ lndt-dec-any tdec decP (x ∷ v) with decP x | lndt-dec-any tdec (tdec decP) v
 
 -- All predicate transformer
 
-data lndt-all {F : TT} (T : TransPred F) {a b} {A : Set a} (P : Pred A b) : Pred (LNDT F A) b where
+data lndt-all {F : TT} (T : TransPred F) {b} {A : Set} (P : Pred A b) : Pred (LNDT F A) b where
   all[] : lndt-all T P []
   all∷ : ∀ {a x} → P a → lndt-all T (T P) x → lndt-all T P (a ∷ x)
 
