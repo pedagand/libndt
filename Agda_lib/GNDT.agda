@@ -40,6 +40,15 @@ data Sig : Set₁ where
 □ (Σ₁ `⊎ Σ₂) P (inj₁ xs₁) = □ Σ₁ P xs₁
 □ (Σ₁ `⊎ Σ₂) P (inj₂ xs₂) = □ Σ₂ P xs₂
 
+⟦_⟧-fold : ∀ Σ {A X}{T : Set → Set} → {{ _ : Applicative T }} → ⟦ Σ ⟧ (T A) (T X) → T (⟦ Σ ⟧ A X)
+⟦ `⊤ ⟧-fold tt = pure tt
+⟦ `K S ⟧-fold k = pure k
+⟦ `X ⟧-fold x = x
+⟦ `A ⟧-fold a = a
+⟦ Σ₁ `× Σ₂ ⟧-fold (xs₁ , xs₂) = ⟦ Σ₁ ⟧-fold xs₁ ⊗ ⟦ Σ₂ ⟧-fold xs₂
+⟦ Σ₁ `⊎ Σ₂ ⟧-fold (inj₁ xs₁) = inj₁ <$> ⟦ Σ₁ ⟧-fold xs₁
+⟦ Σ₁ `⊎ Σ₂ ⟧-fold (inj₂ xs₂) = inj₂ <$> ⟦ Σ₂ ⟧-fold xs₂
+
 -- The specification for generalized ndt data types
 
 data GNDT (Σ : Sig)(F : TT)(A : Set) : Set where
@@ -94,3 +103,12 @@ gndt-map {Σ} map f (ctor xs) = ctor (⟦ Σ ⟧-map f (gndt-map map (map f)) xs
 
 -- XXX: similarly, we should get `lndt-map-cong`, `lndt-map-comp`, `lndt-map-able`
 -- Note: this is missing something about `map-id`
+
+-- Fold functions
+
+-- as above, we could inline `lndt-fold` into `⟦_⟧-fold`, `⟦_⟧-map` and remove the TERMINATING
+{-# TERMINATING #-}
+lndt-fold : ∀ {Σ : Sig}{F : TT} → Map F → Fold F → Fold (GNDT Σ F)
+lndt-fold {Σ}{F} map fold {A}{T} (ctor xs) = ctor <$> ⟦ Σ ⟧-fold (⟦ Σ ⟧-map (λ x → x) help xs)
+  where help : GNDT Σ F (F (T A)) → T (GNDT Σ F (F A))
+        help x = lndt-fold map fold (gndt-map map fold x)
