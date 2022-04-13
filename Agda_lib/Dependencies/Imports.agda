@@ -68,3 +68,11 @@ open import Data.String public
 open import Data.Char public
   using
     (Char ; toℕ ; fromℕ)
+
+open import Category.Applicative public
+  renaming
+    (RawApplicative to Applicative)
+
+open Applicative {{...}} public
+  using
+    (pure ; _⊗_ ; _<$>_)

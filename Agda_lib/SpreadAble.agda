@@ -36,24 +36,7 @@ open MapAble public
 -- FoldAble type constructors
 
 Fold : TT → Set₁
-Fold F = ∀ {A B : Set} → (B → A → B) → B → F A → B
-
-record FoldAble (F : TT) : Set₁ where
-  constructor F⟨_,_⟩
-  field
-    foldl : Fold F
-    foldr : Fold F
-
-  size : {A : Set} → F A → ℕ
-  size = foldr (const ∘ suc) 0
-
-  flatten : {A : Set} → F A → Listₗ A
-  flatten = foldr (flip _∷ₗ_) []ₗ
-
-  show : {A : Set} → (A → String) → (F A → String)
-  show showA = (_++ " ]") ∘ (foldl (λ s → ((s ++ " ") ++_) ∘ showA) "[")
-  
-open FoldAble public
+Fold F = ∀ {A : Set}{T : Set → Set} → {{ _ : Applicative T }} → F (T A) → T (F A)
 
 -- A transformation of predicate over a type constructor (used later for Any and All)
 
@@ -101,7 +84,7 @@ open EqAble public
 record SpreadAble (F : TT) : Setω where
   constructor ⟨_,_,_,_⟩
   field
-    fold-able    : FoldAble   F
+    fold-able    : Fold       F
     map-able     : MapAble    F
     any-all-able : AnyAllAble F
     eq-able      : EqAble     F
