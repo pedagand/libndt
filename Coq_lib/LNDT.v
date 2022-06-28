@@ -130,8 +130,8 @@ induction x.
 + intros; simpl.
   rewrite <- (IHx _ _ (map A B f) (map B C g)).
   rewrite lndt_cng_map with 
-    (f0 := (map A C (fun x0 : A => g (f x0))))
-    (g0:= (fun x0 => map B C g (map A B f x0))) ; auto.
+    (f := (map A C (fun x0 : A => g (f x0))))
+    (g:= (fun x0 => map B C g (map A B f x0))) ; auto.
 Qed.
 
 Definition lndt_mapable {F : TT} (mp : MapAble F) : MapAble (LNDT F) :=
@@ -250,8 +250,7 @@ Definition lndt_any_all_able {F : TT} (aa : AnyAllAble F) : AnyAllAble (LNDT F) 
 (** ** Decidability of equality *)
 Lemma lndt_dec_eq {F : TT} : DecEq F -> DecEq (LNDT F).
 Proof.
-unfold DecEq. intros Hyp A HdecA.
-(* @TODO Fix problem
+unfold DecEq, Decidable. intros Hyp A HdecA.
 induction x ; destruct y.
  + intuition.
  + right ; intro H ; inversion H.
@@ -263,8 +262,6 @@ induction x ; destruct y.
        * right ; intro Hpb. inversion Hpb; contradiction.
     - right; intro Hpb ; inversion Hpb; contradiction.
 Defined.
-*)
-  Admitted.
 
 Definition lndt_eq_able {F : TT} (eq : EqAble F) : EqAble (LNDT F) :=
   mkEq (LNDT F) (lndt_dec_eq (dec_eq F eq)).
