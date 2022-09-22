@@ -48,6 +48,13 @@ SIG = ∀ {a} → Sig a
 data GNDT {a} (Σ : SIG)(F : TT)(A : Set a) : Set a where
   ctor : ⟦ Σ ⟧ A (GNDT Σ F (F A)) → GNDT Σ F A
 
+
+ΣBush : SIG
+ΣBush = `⊤ `⊎ (`A `× `X)
+
+Bush : ∀ {a} → Set a → Set a
+Bush A = GNDT ΣBush Bush A
+
 -- Induction principle over generalized ndt data types
 
 module Induction {Σ : SIG}{F : TT}
