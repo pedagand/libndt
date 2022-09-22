@@ -45,11 +45,49 @@ data Sig a : Set (lsuc a) where
 SIG : Setω
 SIG = ∀ {a} → Sig a
 
-data GNDT {a} (Σ : SIG)(F : TT)(A : Set a) : Set a where
-  ctor : ⟦ Σ ⟧ A (GNDT Σ F (F A)) → GNDT Σ F A
+_∘D_ : ∀ {a} → Sig a → Sig a → Sig a
+`⊤ ∘D Σ' = `⊤
+`K S ∘D Σ' = `K S
+`X ∘D Σ' = Σ'
+`A ∘D Σ' = `A
+(Σ₁ `× Σ₂) ∘D Σ' = (Σ₁ ∘D Σ') `× (Σ₂ ∘D Σ')
+(Σ₁ `⊎ Σ₂) ∘D Σ' = (Σ₁ ∘D Σ') `⊎ (Σ₂ ∘D Σ')
+
+module G  {a} (Σ : SIG)(F : SIG) where
+
+  data GNDT(P : SIG)(A : Set a) : Set a where
+    ctor : ⟦ Σ ⟧ A (GNDT (P ∘D F) (⟦ P ∘D F ⟧ A (GNDT P A))) → GNDT P A
+
+open G public
+
+ΣBush : SIG
+ΣBush = `⊤ `⊎ (`A `× `X)
+
+FBush : SIG
+FBush = ΣBush
+
+Bush : ∀ {a} → Set a → Set a
+Bush A = GNDT ΣBush FBush `X A
+
+bnil : ∀ {a}{A : Set a} → Bush A
+bnil = ctor (inj₁ (lift tt))
+
+bcons : ∀ {a}{A : Set a} → A → Bush (Bush A) → Bush A
+bcons {A = A} a (ctor bs) = ctor (inj₂ (a , ctor {!WRONG DEFINITION!!}))
+
+
+{-
+p-map : ∀ {a}{Σ : SIG}{F : SIG}{A B : Set a} → (A → B) → GNDT Σ F A → GNDT Σ F B
+p-map {Σ = Σ}{F = F} f (ctor x) = {!!} -- ctor (⟦ Σ ⟧-map f (p-map (⟦ F ⟧-map f (p-map f))) x)
+
+bout : ∀{a}{A : Set a} → Bush A → ⟦ ΣBush ⟧ A (⟦ FBush ⟧ A (GNDT ΣBush FBush A))
+bout (ctor x) = ⟦ ΣBush ⟧-map (λ a → a) {!bout!} x
+-}
+
 
 -- Induction principle over generalized ndt data types
 
+{-
 module Induction {Σ : SIG}{F : TT}
                  {b}(P : ∀ {a}{A : Set a} → GNDT Σ F A → Set b)
                  (ih : ∀ {a}{A : Set a} → (xs : ⟦ Σ ⟧ A (GNDT Σ F (F A))) → □ Σ P xs → P (ctor xs)) where
@@ -70,3 +108,4 @@ module Induction {Σ : SIG}{F : TT}
        □-map (Σ₁ `⊎ Σ₂) (inj₂ xs₂) = □-map Σ₂ xs₂
 
 open Induction public
+-}
