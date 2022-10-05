@@ -58,7 +58,7 @@ open FoldAble public
 -- A transformation of predicate over a type constructor (used later for Any and All)
 
 TransPred : TT → Setω
-TransPred F = ∀ {a b} {A : Set a} → Pred A b → Pred (F A) b
+TransPred F = ∀ {a b} {A : Set a} → Pred A b → Pred (F A) (a ⊔ b)
 
 -- The preservation of decidability through TransPred
 

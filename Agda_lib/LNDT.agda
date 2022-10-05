@@ -3,13 +3,13 @@ module LNDT where
 open import Dependencies.Imports
 open import SpreadAble
 
--- The specification for linked lndt data types
+-- The specification for linked lndt
 
 rec : ∀ {a} (F : TT) (A : Set a) → ℕ → Set a
 rec F A zero = Lift _ ⊤
 rec F A (suc n) = A × rec F (F A) n
 
--- XXX: `rec` very obviously inherit whatever structure that `F` has
+-- `rec` inherits whatever structure that `F` has
 -- which is also true for ‵⊤` and which is preserved by product `×`.
 -- THIS IS WHAT SpreadAble IS!
 
@@ -18,20 +18,21 @@ record LNDT {a} (F : TT) (A : Set a) : Set a where
   field
     -- The depth of an instance of LNDT
     depth : ℕ
+    -- Values actually contained in the structure
     values : rec F A depth
 
 open LNDT public
-
-nil : ∀ {a}{F : TT}{A : Set a} → LNDT F A
-nil = [ 0 ]# (lift tt)
-
-cons : ∀ {a}{F : TT}{A : Set a} → A → LNDT F (F A) → LNDT F A
-cons a xs = [ suc (depth xs) ]# (a , values xs)
 
 pattern [] = [ 0 ]# (lift tt)
 pattern _∷_ a xs = [ suc _ ]# (a , xs)
 
 infixr 3 _∷_
+
+nil : ∀ {a} {F : TT} {A : Set a} → LNDT F A
+nil = []
+
+cons : ∀ {a} {F : TT} {A : Set a} → A → LNDT F (F A) → LNDT F A
+cons a ([ _ ]# val) = a ∷ val
 
 -- Induction principle over lndt data types
 
@@ -84,4 +85,56 @@ lndt-fold-able fp = F⟨
     lndt-foldl (foldl fp) ,
     lndt-foldr (foldr fp) ⟩
 
--- XXX: dropped the others: same general idea applies
+-- Any predicate transformer
+
+data lndt-any {F : TT} (T : TransPred F) {a b} {A : Set a} (P : Pred A b) : Pred (LNDT F A) (a ⊔ b) where
+  here : ∀ {a x} → P a → lndt-any T P (cons a x)
+  there : ∀ {a x} → lndt-any T (T P) x → lndt-any T P (cons a x)
+
+lndt-dec-any : ∀ {F : TT} {T : TransPred F} → TransDec T → TransDec (lndt-any T)
+lndt-dec-any _ _ [] = no (λ ())
+lndt-dec-any tdec decP (x ∷ v) with decP x | lndt-dec-any tdec (tdec decP) ([ _ ]# v)
+... | yes p  | _      = yes (here p)
+... | no  _  | yes q  = yes (there q)
+... | no  ¬p | no  ¬q = no (λ {(here p) → ¬p p ; (there q) → ¬q q})
+
+-- All predicate transformer
+
+data lndt-all {F : TT} (T : TransPred F) {a b} {A : Set a} (P : Pred A b) : Pred (LNDT F A) (a ⊔ b) where
+  all[] : lndt-all T P []
+  all∷ : ∀ {a x} → P a → lndt-all T (T P) x → lndt-all T P (cons a x)
+
+lndt-dec-all : ∀ {F : TT} {T : TransPred F} → TransDec T → TransDec (lndt-all T)
+lndt-dec-all _ _ [] = yes all[]
+lndt-dec-all tdec decP (x ∷ v) with decP x | lndt-dec-all tdec (tdec decP) ([ _ ]# v)
+... | no  ¬p | _      = no λ {(all∷ p _) → ¬p p}
+... | yes _  | no  ¬q = no λ {(all∷ _ q) → ¬q q}
+... | yes p  | yes q  = yes (all∷ p q)
+
+lndt-any-all-able : ∀ {F : TT} → AnyAllAble F → AnyAllAble (LNDT F)
+lndt-any-all-able aa = A⟨
+    lndt-any (any aa) ,
+    lndt-dec-any (dec-any aa) ,
+    lndt-all (all aa) ,
+    lndt-dec-all (dec-all aa) ⟩
+
+-- Decidability of equality
+
+lndt-dec-eq : ∀ {F : TT} → DecEq F → DecEq (LNDT F)
+lndt-dec-eq _      _   []      []        = yes refl
+lndt-dec-eq _      _   []      (_ ∷ _)   = no (λ ())
+lndt-dec-eq _      _   (_ ∷ _) []        = no (λ ())
+lndt-dec-eq decEqF _≟_ (x ∷ y) (x₁ ∷ y₁) with x ≟ x₁ | lndt-dec-eq decEqF (decEqF _≟_) ([ _ ]# y) ([ _ ]# y₁)
+... | yes refl | yes refl = yes refl
+... | yes refl | no  ¬q   = no λ {refl → ¬q refl}
+... | no  ¬p   | _        = no λ {refl → ¬p refl}
+
+lndt-eq-able : ∀ {F : TT} → EqAble F → EqAble (LNDT F)
+lndt-eq-able eq = E⟨ lndt-dec-eq (dec-eq eq) ⟩
+
+lndt-spread-able : ∀ {F : TT} → SpreadAble F → SpreadAble (LNDT F)
+lndt-spread-able sp = ⟨
+  lndt-fold-able (fold-able sp) ,
+  lndt-map-able (map-able sp) ,
+  lndt-any-all-able (any-all-able sp) ,
+  lndt-eq-able (eq-able sp) ⟩

@@ -45,7 +45,7 @@ open import Relation.Unary public
     
 open import Agda.Primitive public
   using
-    (Setω)
+    (Setω ; _⊔_)
 
 open import Level public
   using
